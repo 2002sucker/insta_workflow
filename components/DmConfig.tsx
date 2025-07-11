@@ -6,11 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 
-interface DmConfigProps {
-  onDmChange: (dm: string) => void;
-  onOpeningDmChange: (enabled: boolean) => void;
-}
-
 // Define the type for a feature item
 interface FeatureToggleProps {
   label: string;
@@ -34,27 +29,61 @@ function FeatureToggle({ label, isPro = false }: FeatureToggleProps) {
   );
 }
 
-export function DmConfig({ onDmChange, onOpeningDmChange }: DmConfigProps) {
+interface DmConfigProps {
+  onOpeningDmChange: (dm: string) => void;
+  onOpeningDmEnabledChange: (enabled: boolean) => void;
+  onFollowUpDmChange: (dm: string) => void;
+}
+
+export function DmConfig({
+  onOpeningDmChange,
+  onOpeningDmEnabledChange,
+  onFollowUpDmChange,
+}: DmConfigProps) {
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold mb-4">They will get</h2>
+
+        {/* Opening DM Section */}
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-medium">Opening DM</h3>
-          <Switch defaultChecked onCheckedChange={onOpeningDmChange} />
+          <Switch defaultChecked onCheckedChange={onOpeningDmEnabledChange} />
         </div>
         <Textarea
-          placeholder="Hey there! I'm so happy you're here, thanks so much for your interest..."
+          placeholder="Hey there! I'm so happy you're here..."
           className="bg-gray-800 border-gray-700"
           rows={4}
           defaultValue="Hey there! I'm so happy you're here, thanks so much for your interest 😊. Click below and I'll send you the link in just a sec ✨"
-          onChange={(e) => onDmChange(e.target.value)}
+          onChange={(e) => onOpeningDmChange(e.target.value)}
         />
-        <Button variant="outline" className="w-full mt-3">
-          + Add A Link
-        </Button>
+        <a
+          href="#"
+          className="text-sm text-blue-400 mt-2 block hover:underline"
+        >
+          Why does an Opening DM matter?
+        </a>
+
+        {/* Follow-up Message Section (as seen in the video) */}
+        <div className="mt-4">
+          <Textarea
+            id="follow-up-dm"
+            placeholder="Write a message"
+            className="bg-gray-800 border-gray-700 mt-2"
+            rows={3}
+            defaultValue="Hey"
+            onChange={(e) => onFollowUpDmChange(e.target.value)}
+          />
+          <p className="text-xs text-gray-400 mt-1">
+            The message the DM you'd like to send
+          </p>
+          <Button variant="outline" className="w-full mt-3">
+            + Add A Link
+          </Button>
+        </div>
       </div>
 
+      {/* More things to automate section */}
       <div>
         <h2 className="text-lg font-semibold mb-4">More things to automate</h2>
         <div className="space-y-2">

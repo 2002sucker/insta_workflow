@@ -1,29 +1,31 @@
+
+
 // components/MobilePreview.tsx
 
 'use client';
 
-import { Post } from '@/lib/types';
-import { ArrowLeft, Heart, PlusCircle, Send, Smile } from 'lucide-react';
-import Image from 'next/image';
 import { useState } from 'react';
+import { Post } from '@/lib/types';
+import Image from 'next/image';
 import { Button } from './ui/button';
+import { ArrowLeft, Send, PlusCircle, Heart, MessageCircle, Smile } from 'lucide-react';
 
 interface MobilePreviewProps {
   post: Post;
   comment: string;
-  dm: string;
+  openingDm: string;
   openingDmEnabled: boolean;
+  followUpDm: string;
 }
 
 export function MobilePreview({
   post,
   comment,
-  dm,
+  openingDm,
   openingDmEnabled,
+  followUpDm,
 }: MobilePreviewProps) {
-  const [activeTab, setActiveTab] = useState<'post' | 'comments' | 'dm'>(
-    'post'
-  );
+  const [activeTab, setActiveTab] = useState<'post' | 'comments' | 'dm'>('post');
 
   const renderContent = () => {
     switch (activeTab) {
@@ -31,18 +33,13 @@ export function MobilePreview({
         return (
           <div className="p-4 flex-grow">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold">Comments</h2>
-              <Send size={20} />
+               <h2 className="font-semibold">Comments</h2>
+               <Send size={20} />
             </div>
+            {/* Logic fixed: only render the comment bubble if the comment string is not empty */}
             {comment && (
               <div className="flex items-start space-x-3">
-                <Image
-                  src="/avatars/user.png"
-                  width={32}
-                  height={32}
-                  alt="User Avatar"
-                  className="rounded-full"
-                />
+                <Image src="/globe.svg" width={32} height={32} alt="User Avatar" className="rounded-full" />
                 <div className="flex-1">
                   <p>
                     <span className="font-semibold text-sm mr-2">Username</span>
@@ -52,35 +49,38 @@ export function MobilePreview({
                 </div>
               </div>
             )}
-            <div className="absolute bottom-0 left-0 right-0 p-2 bg-black border-t border-gray-800 flex items-center space-x-2">
-              <PlusCircle size={24} />
-              <input
-                type="text"
-                placeholder="Add a comment for username..."
-                className="flex-1 bg-transparent text-sm focus:outline-none"
-                readOnly
-              />
-              <Heart size={20} />
-              <Smile size={20} />
+             <div className="absolute bottom-0 left-0 right-0 p-2 bg-black border-t border-gray-800 flex items-center space-x-2">
+                <PlusCircle size={24} />
+                <input
+                    type="text"
+                    placeholder="Add a comment for username..."
+                    className="flex-1 bg-transparent text-sm focus:outline-none"
+                    readOnly
+                />
+                <Heart size={20} />
+                <Smile size={20} />
             </div>
           </div>
         );
       case 'dm':
         return (
           <div className="p-4 flex-grow flex flex-col">
-            {openingDmEnabled && (
-              <>
-                <div className="self-start bg-gray-700 p-3 rounded-2xl max-w-xs mb-2">
-                  <p className="text-sm">{dm}</p>
+             {/* Logic fixed: This bubble is controlled by the "Opening DM" textarea */}
+             {openingDmEnabled && openingDm && (
+               <div className="self-start bg-gray-700 p-3 rounded-2xl max-w-xs mb-2">
+                 <p className="text-sm">{openingDm}</p>
+               </div>
+             )}
+             {/* This is the static user reply from the video */}
+             <div className="self-end bg-purple-600 text-white p-3 rounded-2xl max-w-xs mb-4">
+                <p className="text-sm">Send me the link</p>
+             </div>
+             {/* Logic fixed: This bubble is controlled by the second "Write a message" textarea */}
+             {followUpDm && (
+                <div className="self-start bg-gray-700 p-3 rounded-2xl max-w-xs">
+                    <p className="text-sm">{followUpDm}</p>
                 </div>
-                <div className="self-end bg-purple-600 text-white p-3 rounded-2xl max-w-xs mb-4">
-                  <p className="text-sm">Send me the link</p>
-                </div>
-              </>
-            )}
-            <div className="self-start bg-gray-700 p-3 rounded-2xl max-w-xs">
-              <p className="text-sm">Hey</p>
-            </div>
+             )}
           </div>
         );
       case 'post':
@@ -88,28 +88,13 @@ export function MobilePreview({
         return (
           <div>
             <div className="flex items-center p-3">
-              <Image
-                src={post.avatar}
-                width={32}
-                height={32}
-                alt="Avatar"
-                className="rounded-full"
-              />
-              <span className="ml-3 font-semibold text-sm">
-                {post.username}
-              </span>
+                <Image src={post.avatar} width={32} height={32} alt="Avatar" className="rounded-full" />
+                <span className="ml-3 font-semibold text-sm">{post.username}</span>
             </div>
-            <Image
-              src={post.image}
-              alt="Post"
-              width={375}
-              height={375}
-              className="w-full"
-            />
+            <Image src={post.image} alt="Post" width={375} height={375} className="w-full" />
             <div className="p-3">
               <p className="text-sm">
-                <span className="font-semibold">{post.username}</span>{' '}
-                {post.caption}
+                <span className="font-semibold">{post.username}</span> {post.caption}
               </p>
             </div>
           </div>
@@ -135,24 +120,9 @@ export function MobilePreview({
 
         {/* Footer Tabs */}
         <div className="flex justify-around p-2 border-t border-gray-700">
-          <Button
-            variant={activeTab === 'post' ? 'secondary' : 'ghost'}
-            onClick={() => setActiveTab('post')}
-          >
-            Post
-          </Button>
-          <Button
-            variant={activeTab === 'comments' ? 'secondary' : 'ghost'}
-            onClick={() => setActiveTab('comments')}
-          >
-            Comments
-          </Button>
-          <Button
-            variant={activeTab === 'dm' ? 'secondary' : 'ghost'}
-            onClick={() => setActiveTab('dm')}
-          >
-            DM
-          </Button>
+          <Button variant={activeTab === 'post' ? 'secondary' : 'ghost'} onClick={() => setActiveTab('post')}>Post</Button>
+          <Button variant={activeTab === 'comments' ? 'secondary' : 'ghost'} onClick={() => setActiveTab('comments')}>Comments</Button>
+          <Button variant={activeTab === 'dm' ? 'secondary' : 'ghost'} onClick={() => setActiveTab('dm')}>DM</Button>
         </div>
       </div>
     </div>
